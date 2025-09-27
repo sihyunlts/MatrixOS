@@ -117,7 +117,7 @@ namespace Device
 // LED
 #define MAX_LED_LAYERS 8
   inline gpio_num_t led_pin;
-  const inline uint16_t fps = 120;  // Depends on the FreeRTOS tick speed
+  const inline uint16_t fps = 280;  // Depends on the FreeRTOS tick speed
   // const Dimension grid_size(8,8);
   // const Point grid_offset = Point(1,1);
 
