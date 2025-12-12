@@ -27,7 +27,7 @@ namespace Device
   namespace LED
   {
     #define MAX_LED_LAYERS 8
-    const inline uint16_t fps = 120;  // Depends on the FreeRTOS tick speed
+    const inline uint16_t fps = 280;  // Depends on the FreeRTOS tick speed
 
     inline uint16_t count = 64 + 32;
     inline uint8_t brightness_level[8] = {8, 22, 39, 60, 84, 110, 138, 169};
