@@ -166,11 +166,17 @@ namespace WS2812
       return;
     }
 
-    // Check if RMT transmission is complete, skip frame if busy to prevent blocking
-    if (rmt_tx_wait_all_done(rmt_channel, 0) != ESP_OK) {
-      // RMT is busy with previous transmission, skip this frame
-      return;
-    }
+    // Disable for fast LED playback
+      // Check if RMT transmission is complete, skip frame if busy to prevent blocking
+      // if (rmt_tx_wait_all_done(rmt_channel, 0) != ESP_OK) {
+      //   // RMT is busy with previous transmission, skip this frame
+      //   return;
+      // }
+
+    // Wait for previous transmission to complete (Blocking)
+    // This ensures we don't skip frames, matching the behavior of older MatrixOS versions.
+    // Note: This may impact system responsiveness if FPS is set too high.
+    ESP_ERROR_CHECK(rmt_tx_wait_all_done(rmt_channel, portMAX_DELAY));
 
     for (uint8_t partition_index = 0; partition_index < WS2812::partitions->size(); partition_index++)
     {
