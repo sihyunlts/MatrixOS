@@ -132,6 +132,49 @@ namespace Device
     });
     deviceSettings.AddUIComponent(deviceSerialBtn, Point(1, 7));
 
+    // Custom Boot Animation Color
+    UIButton bootColorBtn;
+    Color bootColor = Color(0x00FFFF); 
+    bool bootColorEnabled = false;
+    if (MatrixOS::NVS::GetVariable(StringHash("MystrixBootColor"), &bootColor, sizeof(Color))) {}
+    MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorEnabled"), &bootColorEnabled, sizeof(bool));
+
+    bootColorBtn.SetName("Boot Animation");
+    bootColorBtn.SetColorFunc([&]() -> Color {
+      return bootColorEnabled ? bootColor : Color(0x00FFFF);
+    });
+    bootColorBtn.OnPress([&]() -> void {
+       UI bootSettings("Boot Animation", Color(0x00FFFF));
+
+       UIButton colorPickBtn;
+       colorPickBtn.SetName("Animation Color");
+       colorPickBtn.SetSize(Dimension(6, 3)); 
+       colorPickBtn.SetEnabled(bootColorEnabled);
+       colorPickBtn.SetColorFunc([&]() -> Color { return bootColor; });
+       colorPickBtn.OnPress([&]() -> void {
+          Color newColor = bootColor;
+          if (MatrixOS::UIUtility::ColorPicker(newColor, false)) {
+              bootColor = newColor;
+              MatrixOS::NVS::SetVariable(StringHash("MystrixBootColor"), &bootColor, sizeof(Color));
+          }
+       });
+       bootSettings.AddUIComponent(colorPickBtn, Point(1, 1));
+
+       UIToggle enableToggle;
+       enableToggle.SetName("Custom Color");
+       enableToggle.SetSize(Dimension(2, 2));
+       enableToggle.SetValuePointer(&bootColorEnabled);
+       enableToggle.SetColor(Color::White);
+       enableToggle.OnPress([&]() -> void {
+           MatrixOS::NVS::SetVariable(StringHash("MystrixBootColorEnabled"), &bootColorEnabled, sizeof(bool));
+           colorPickBtn.SetEnabled(bootColorEnabled);
+       });
+       bootSettings.AddUIComponent(enableToggle, Point(3, 5));
+
+       bootSettings.Start();
+    });
+    deviceSettings.AddUIComponent(bootColorBtn, Point(7, 7));
+
     deviceSettings.Start();
   }
 

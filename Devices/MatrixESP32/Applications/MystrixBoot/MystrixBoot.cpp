@@ -205,6 +205,18 @@ void MystrixBoot::BootPhase2() {
     memcpy(hue, hueList[1], sizeof(hue));
 #endif
 
+    // Custom Boot Animation Color
+    Color custom_color;
+    bool custom_color_enabled = false;
+    MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorEnabled"), &custom_color_enabled, sizeof(bool));
+
+    if (custom_color_enabled && MatrixOS::NVS::GetVariable(StringHash("MystrixBootColor"), &custom_color, sizeof(Color)) == 0) {
+        float h, s, v;
+        Color::RgbToHsv(custom_color, &h, &s, &v);
+        hue[0] = h;
+        hue[1] = h;
+    }
+
   const uint16_t start_offset = 120;
   if (timer.Tick(1000 / Device::LED::fps))
   {
