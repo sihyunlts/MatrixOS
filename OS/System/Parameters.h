@@ -40,4 +40,4 @@
 
 inline const uint16_t hold_threshold = 400;
 
-inline const uint16_t crossfade_duration = 200;
+inline const uint16_t crossfade_duration = 120;

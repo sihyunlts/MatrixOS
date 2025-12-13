@@ -476,8 +476,8 @@ void Shell::LaunchAnimation(Point origin, Color color)
 
   uint32_t startTime = MatrixOS::SYS::Millis();
 
-  const float speed = 30; // base mills per pixel
-  const float edgeInnerWidth = -8;
+  const float speed = 25; // base mills per pixel
+  const float edgeInnerWidth = -6;
   const float edgeWidth = 1;
   const float edgeOuterWidth = 1;
   const float endDistance = 20;

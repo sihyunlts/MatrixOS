@@ -35,7 +35,7 @@ namespace MatrixOS::UIUtility
     }
 
     // Convert the scroll speed from frames per second to milliseconds per frame
-    speed = 1000 / speed;
+    speed = 800 / speed;
 
     // Main loop (if loop == true)
     do

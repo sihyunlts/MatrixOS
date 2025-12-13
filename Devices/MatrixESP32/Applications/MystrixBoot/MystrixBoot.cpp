@@ -14,7 +14,7 @@ void MystrixBoot::Setup(const vector<string>& args) {
 
 bool MystrixBoot::Idle(bool ready) {
   uint8_t step = counter % 12;
-  if (timer.Tick(80))
+  if (timer.Tick(60))
   {
     MatrixOS::LED::Fill(0);
     const Color local_color = Color::White.Scale(MATRIX_BOOT_IDLE * 255);
@@ -58,7 +58,7 @@ void MystrixBoot::BootPhase1() {
   if (boot_phase_1_tick_time == 0)
     boot_phase_1_tick_time = MatrixOS::SYS::Millis();
 
-  const uint16_t section_time = 80;
+  const uint16_t section_time = 60;
   if (timer.Tick(1000 / Device::LED::fps))
   {
     uint32_t delta_time = MatrixOS::SYS::Millis() - boot_phase_1_tick_time;
@@ -205,7 +205,7 @@ void MystrixBoot::BootPhase2() {
     memcpy(hue, hueList[1], sizeof(hue));
 #endif
 
-  const uint16_t start_offset = 150;
+  const uint16_t start_offset = 120;
   if (timer.Tick(1000 / Device::LED::fps))
   {
 
