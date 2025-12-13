@@ -79,18 +79,24 @@ void Setting::SystemSetting() {
   });
   systemSetting.AddUIComponent(deviceIdBtn, Point(Device::x_size - 2, Device::y_size - 1));
 
+  UIButton rebootDevice;
+  rebootDevice.SetName("Reboot Device");
+  rebootDevice.SetColor(Color(0x5500ff));
+  rebootDevice.OnPress([]() -> void { MatrixOS::SYS::Reboot(); });
+  systemSetting.AddUIComponent(rebootDevice, Point(0, Device::y_size - 1));
+
   UIButton enterDfuBtn;
   enterDfuBtn.SetName("Enter Bootloader Mode");
   enterDfuBtn.SetColor(Color(0xFF0000));
   enterDfuBtn.OnPress([]() -> void { MatrixOS::SYS::Bootloader(); });
-  systemSetting.AddUIComponent(enterDfuBtn, Point(0, Device::y_size - 1));
+  systemSetting.AddUIComponent(enterDfuBtn, Point(1, Device::y_size - 1));
 
   UIButton resetDevice;
   resetDevice.SetName("Factory Reset Device");
   resetDevice.SetColor(Color(0xFF00FF));
   resetDevice.OnPress([]() -> void { Setting::ResetConfirm(); });
   // resetDevice.SetEnabled(MatrixOS::UserVar::developer_mode);
-  systemSetting.AddUIComponent(resetDevice, Point(1, Device::y_size - 1));
+  systemSetting.AddUIComponent(resetDevice, Point(0, Device::y_size - 2));
 
   UIButton osVersionBtn;
     osVersionBtn.SetName("Matrix OS Version");
