@@ -11,3 +11,8 @@
 	path = Library/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson.git
 	branch = 7.x
+
+# External Applications
+[submodule "Applications/Gomoku"]
+	path = Applications/Gomoku
+	url = https://github.com/sihyunlts/Matrix-OS-Gomoku.git

@@ -32,6 +32,7 @@ Lighting
 Dice
 Strum
 Reversi
+Gomoku
 Companion
 # PolyPlayground
 [System]Python
