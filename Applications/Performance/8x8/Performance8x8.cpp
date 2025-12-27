@@ -375,6 +375,32 @@ void Performance::SysExHandler(MidiPacket midiPacket) {
         }
         custom_palette_available[palette_to_write] = true;
       }
+      else if (sysExBuffer[1] == 0x1D)  // Delete Palette
+      {
+        MLOGD("Performance", "Retina Custom Palette Deletion");
+        uint8_t palette_to_delete = sysExBuffer[2];
+        if (palette_to_delete < CUSTOM_PALETTE_COUNT)
+        {
+          custom_palette_available[palette_to_delete] = false;
+          
+          // Reset selection if the deleted palette was active
+          uint8_t current_palette_idx = selectedPalette.Get();
+          if (!paletteFollowChannel && current_palette_idx == (BUILTIN_PALETTE_COUNT + palette_to_delete))
+          {
+            selectedPalette = 0; // Back to default
+            selectedPalette.Save();
+          }
+
+          // Clear the actual palette data to defaults
+          custom_palette[palette_to_delete][0] = Color(0);
+          for (uint16_t j = 1; j < 128; j++)
+          {
+            custom_palette[palette_to_delete][j] = Color::White;
+          }
+
+          MatrixOS::NVS::SetVariable(custom_palette_available_nvs_hash, custom_palette_available, sizeof(custom_palette_available));
+        }
+      }
       else if (sysExBuffer[1] == 0x7D)  // Uploading End
       {
         MLOGD("Performance", "Retina Custom Palette Uploading End");
