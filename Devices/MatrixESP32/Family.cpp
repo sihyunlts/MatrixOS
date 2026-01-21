@@ -1,6 +1,7 @@
 #include "Device.h"
 #include "MatrixOS.h"
 #include "UI/UI.h"
+#include "Applications/MystrixBoot/MystrixBoot.h"
 
 #include "esp_private/system_internal.h"  // For esp_reset_reason_set_hint
 #include "esp_timer.h"  // esp_timer_get_time
@@ -172,7 +173,7 @@ namespace Device
 
        UIToggle enableToggle;
        enableToggle.SetName("Custom Color");
-       enableToggle.SetSize(Dimension(2, 2));
+       enableToggle.SetSize(Dimension(1, 2));
        enableToggle.SetValuePointer(&bootColorEnabled);
        enableToggle.SetColor(Color::White);
        enableToggle.OnPress([&]() {
@@ -180,7 +181,26 @@ namespace Device
            colorPickBtnA.SetEnabled(bootColorEnabled);
            colorPickBtnB.SetEnabled(bootColorEnabled);
        });
-       bootSettings.AddUIComponent(enableToggle, Point(3, 5));
+       bootSettings.AddUIComponent(enableToggle, Point(0, 3));
+
+       UIButton previewBtn;
+       previewBtn.SetName("Preview");
+       previewBtn.SetSize(Dimension(1, 2));
+       previewBtn.SetColor(Color::Cyan);
+        previewBtn.OnPress([&]() {
+            MatrixOS::LED::Fade(120);
+            MatrixOS::SYS::DelayMs(120); //to do: fix
+            MystrixBoot* preview = new MystrixBoot();
+            preview->Setup({"preview"});
+            while(!preview->Done()) {
+                preview->Boot();
+                MatrixOS::SYS::DelayMs(10);
+            }
+            preview->End();
+            delete preview;
+            MatrixOS::LED::Fade(120);
+        });
+       bootSettings.AddUIComponent(previewBtn, Point(7, 3));
 
        bootSettings.Start();
     });

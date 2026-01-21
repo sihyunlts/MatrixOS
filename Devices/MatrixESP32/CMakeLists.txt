@@ -69,6 +69,7 @@ add_library(MatrixOSDevice
 target_include_directories(MatrixOSDevice PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/Variants/Mystrix
+    ${CMAKE_SOURCE_DIR}/Applications
     ${CMAKE_SOURCE_DIR}/Platform/ESP32SX
     ${CMAKE_SOURCE_DIR}/Library/FatFs/source
 )

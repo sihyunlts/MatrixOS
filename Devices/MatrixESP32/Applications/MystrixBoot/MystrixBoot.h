@@ -24,6 +24,14 @@ class MystrixBoot : public BootAnimation {
   uint8_t boot_phase;
   uint32_t boot_phase_1_tick_time = 0;
   uint32_t boot_phase_2_start_time = 0;
+
+  // Custom Color
+  float custom_hue[2];
+  bool custom_color_enabled = false;
+  bool is_preview = false;
+  bool done = false;
+  bool Done() { return done; }
+
   float hueList[8][2] = {
       {0.5f, 0.833f},  // Pro - Pink Cyan
       {0.5f, 0.167f}    // Standard - Yellow Cyan

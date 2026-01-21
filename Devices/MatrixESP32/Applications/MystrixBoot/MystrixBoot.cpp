@@ -10,6 +10,27 @@ void MystrixBoot::Setup(const vector<string>& args) {
     if (MatrixOS::USB::Connected())
       break;
   }
+
+  for (const string& arg : args) {
+      if (arg == "preview") {
+          is_preview = true;
+      }
+  }
+
+  // Load Custom Boot Color
+  MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorEnabled"), &custom_color_enabled, sizeof(bool));
+  if (custom_color_enabled) {
+      Color c[2];
+      float h[2], s[2], v[2];
+      if (MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorA"), &c[0], sizeof(Color)) == 0) {
+          Color::RgbToHsv(c[0], &h[0], &s[0], &v[0]);
+          custom_hue[0] = h[0];
+      }
+      if (MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorB"), &c[1], sizeof(Color)) == 0) {
+          Color::RgbToHsv(c[1], &h[1], &s[1], &v[1]);
+          custom_hue[1] = h[1];
+      }
+  }
 }
 
 bool MystrixBoot::Idle(bool ready) {
@@ -205,22 +226,10 @@ void MystrixBoot::BootPhase2() {
     memcpy(hue, hueList[1], sizeof(hue));
 #endif
 
-    // Custom Boot Animation Color
-    Color custom_color[2];
-    bool custom_color_enabled = false;
-    MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorEnabled"), &custom_color_enabled, sizeof(bool));
-
+    // Apply Custom Boot Animation Color
     if (custom_color_enabled) {
-        float h[2], s[2], v[2];
-        if (MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorA"), &custom_color[0], sizeof(Color)) == 0) {
-            Color::RgbToHsv(custom_color[0], &h[0], &s[0], &v[0]);
-            hue[0] = h[0];
-        }
-        
-        if (MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorB"), &custom_color[1], sizeof(Color)) == 0) {
-            Color::RgbToHsv(custom_color[1], &h[1], &s[1], &v[1]);
-            hue[1] = h[1];
-        }
+        hue[0] = custom_hue[0];
+        hue[1] = custom_hue[1];
     }
 
   const uint16_t start_offset = 120;
@@ -233,7 +242,10 @@ void MystrixBoot::BootPhase2() {
     uint32_t delta_time = MatrixOS::SYS::Millis() - boot_phase_2_start_time;
     uint8_t quad_size = max(X_SIZE, Y_SIZE) / 2 + 1;
     if (delta_time > (quad_size - 2) * start_offset + 700 + 100)
-    { Exit(); }
+    { 
+        done = true;
+        if (!is_preview) Exit(); 
+    }
 
     for (uint8_t r = 0; r < quad_size; r++)  // radius
     {
