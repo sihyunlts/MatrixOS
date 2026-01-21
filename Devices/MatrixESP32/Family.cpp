@@ -134,40 +134,51 @@ namespace Device
 
     // Custom Boot Animation Color
     UIButton bootColorBtn;
-    Color bootColor = Color(0x00FFFF); 
+
+    char variant = Device::deviceInfo.Model[3];
+    Color bootColorA = Color::Cyan; 
+    Color bootColorB = (variant == 'P') ? Color::HsvToRgb(0.833f, 1.0f, 1.0f) : Color::HsvToRgb(0.167f, 1.0f, 1.0f);
     bool bootColorEnabled = false;
-    if (MatrixOS::NVS::GetVariable(StringHash("MystrixBootColor"), &bootColor, sizeof(Color))) {}
+
+    MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorA"), &bootColorA, sizeof(Color));
+    MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorB"), &bootColorB, sizeof(Color));
     MatrixOS::NVS::GetVariable(StringHash("MystrixBootColorEnabled"), &bootColorEnabled, sizeof(bool));
 
-    bootColorBtn.SetName("Boot Animation");
-    bootColorBtn.SetColorFunc([&]() -> Color {
-      return bootColorEnabled ? bootColor : Color(0x00FFFF);
-    });
-    bootColorBtn.OnPress([&]() -> void {
-       UI bootSettings("Boot Animation", Color(0x00FFFF));
+    auto getDynamicBootColor = [&]() {
+      return Color::Crossfade(bootColorA, bootColorB, Fract16(ColorEffects::Breath(2500), 8));
+    };
 
-       UIButton colorPickBtn;
-       colorPickBtn.SetName("Animation Color");
-       colorPickBtn.SetSize(Dimension(6, 3)); 
-       colorPickBtn.SetEnabled(bootColorEnabled);
-       colorPickBtn.SetColorFunc([&]() -> Color { return bootColor; });
-       colorPickBtn.OnPress([&]() -> void {
-          Color newColor = bootColor;
-          if (MatrixOS::UIUtility::ColorPicker(newColor, false)) {
-              bootColor = newColor;
-              MatrixOS::NVS::SetVariable(StringHash("MystrixBootColor"), &bootColor, sizeof(Color));
-          }
-       });
-       bootSettings.AddUIComponent(colorPickBtn, Point(1, 1));
+    bootColorBtn.SetName("Boot Animation");
+    bootColorBtn.SetColorFunc([&]() { return bootColorEnabled ? getDynamicBootColor() : Color::Cyan; });
+    bootColorBtn.OnPress([&]() {
+       UI bootSettings("Boot Animation", Color::Cyan);
+
+       auto setupColorBtn = [&](UIButton& btn, string name, Color& colorVar, const char* nvsKey, Point pos) {
+           btn.SetName(name);
+           btn.SetSize(Dimension(3, 3));
+           btn.SetEnabled(bootColorEnabled);
+           btn.SetColorFunc([&colorVar]() { return colorVar; });
+           btn.OnPress([&colorVar, nvsKey]() {
+              if (MatrixOS::UIUtility::ColorPicker(colorVar, false)) {
+                  MatrixOS::NVS::SetVariable(StringHash(nvsKey), &colorVar, sizeof(Color));
+              }
+           });
+           bootSettings.AddUIComponent(btn, pos);
+       };
+
+       UIButton colorPickBtnA, colorPickBtnB;
+       setupColorBtn(colorPickBtnA, "Primary Color", bootColorA, "MystrixBootColorA", Point(4, 1));
+       setupColorBtn(colorPickBtnB, "Secondary Color", bootColorB, "MystrixBootColorB", Point(1, 1));
 
        UIToggle enableToggle;
        enableToggle.SetName("Custom Color");
        enableToggle.SetSize(Dimension(2, 2));
        enableToggle.SetValuePointer(&bootColorEnabled);
        enableToggle.SetColor(Color::White);
-       enableToggle.OnPress([&]() -> void {
+       enableToggle.OnPress([&]() {
            MatrixOS::NVS::SetVariable(StringHash("MystrixBootColorEnabled"), &bootColorEnabled, sizeof(bool));
-           colorPickBtn.SetEnabled(bootColorEnabled);
+           colorPickBtnA.SetEnabled(bootColorEnabled);
+           colorPickBtnB.SetEnabled(bootColorEnabled);
        });
        bootSettings.AddUIComponent(enableToggle, Point(3, 5));
 
